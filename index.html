@@ -1,23 +1,101 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>James Carlson</title>
-        <script src="jquery.min.js"></script>
-        <link rel="stylesheet" type="text/css" href="bootstrap.min.css">
-        <script src="bootstrap.min.js"></script>
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-    </head>
-    <body>
-        <div class="jumbotron">
-            <h1>James Carlson</h1> 
-
-            </p>
-        </div>
-        <div class="container">
-            <h1>Nothing here yet!</h1>
-        </div>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"><head>
 
 
-    </body>
-</html>
+<style>
+div.padded {
+padding-top: 0px;
+padding-right: 50px;
+padding-bottom: 0.25in;
+padding-left: 50px;
+}
+</style><title>James Carlson | CS 184</title>
 
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="bootstrap.min.css"></head><body>
+<h1 align="center">Assignment 5: Final Project Proposal<br>
+</h1>
+<h2 align="center">James Carlson, Quinn Romanek</h2>
+<h3 style="text-align: center;">&nbsp; Subsurface Scattering and Static Scene VR rendering<br>
+</h3>
+<br>
+
+<div class="padded">
+<h2 align="center"><br>
+</h2><span style="font-weight: bold;"><span style="font-weight: bold;"></span></span>
+<h4>Summary</h4>
+We will be implementing subsurface scattering based on the <a href="https://graphics.stanford.edu/papers/bssrdf/bssrdf.pdf">paper here, </a>as well as a new way to generate and record rays so that the end scene can be viewed in a VR viewer. <br>
+<br>
+<h4>
+Background</h4>
+
+<br>Subsurface scattering is usually an expensive way to make rendered
+meshes of certain types of objects, for example, human skin look much
+more realistic and soft instead of looking like a hard plasticky
+surface. When using subsurface scattering, translucent objects can be
+accurately rendered. <br>
+<br>
+This problem is difficult since to simulate it in the way that it
+actually occurs, i.e. the light bouncing around many many times inside
+the object, we need either a lot of computing power or a lot of render
+time. The linked paper describes multiple types of approximations that
+greatly reduce render time, and it is an interesting and challenging
+task to fine tune the approximations to look like the true simulated
+result that was computed with Monte Carlo integration.<br>
+<br>
+For the VR scene rendering, we will most likely be rendering a sphere
+representation that we can show on a Samsung GearVR. This should be a
+somewhat trivial task and we will tailor how we take samples from the
+sphere to how existing VR photo viewer apps take in photos. <br>
+<br>
+The paper linked in the summary will be helpful to us in our implementation of subsurface scattering. <a href="http://graphics.ucsd.edu/%7Ehenrik/images/subsurf.html">This website</a> also has many links to examples of subsurface scattering and some more description of it. <br>
+<br>
+<br>
+<h4>
+Resources</h4>
+<br>
+We will be using our own computers to extend the Project 3 (or possibly
+4) code. We may try to add optimizations to the raytracer to reduce
+render times.<br>
+<br>
+<h4>
+Goals and Deliverables</h4>
+<br>
+<img style="width: 1000px; height: 280px;" src="images/subsurface_scattering.png" alt=""><br>
+<br>
+We intend to acheive results like the one shown above, where the images
+of objects with subsurface scattering look believable (like <span style="font-weight: bold;"><span style="font-weight: bold;">b </span></span>and <span style="font-weight: bold;">c</span>
+above) instead of hard and plasticky. We will show renderings of (at
+least) marble, and most likely translucent plastic. The math in the
+paper does seem quite complex but one of us has gotten a start on
+understanding it and there are other resources online to help, so this
+could be a point of difficulty. If we cannot figure it out ourselves we
+will come to office hours and ask about it. <br>
+<br>
+If we have more time to work on stuff and things go well, we would like
+to add additional BSDFs such as microfacet, or changing properties of
+scattering per depth from the object surface in order to simulate
+materials like skin where different layers scatter colors differentlly.
+<br>
+<br>
+Schedule<br>
+<br><span style="font-style: italic;">
+In this section you should organize and plan the tasks and subtasks
+that your team will execute. Since presentations are 2.5 weeks from the
+due-date of the proposal, we recommend that you include a task for
+every half week.</span><br>
+<br>
+4/20 - Understand the relevant math results from the paper that we will need for the implementation, modify <span style="font-weight: bold;">generate_ray</span> to allow creation of samples in a sphere pattern for use with the VR viewer. <br>
+<br>
+4/23 - Get the single scattering term working<br>
+<br>
+4/27 - Have multiple scattering most of the way working<br>
+<br>
+4/30 - Have working subsurface scattering implementation, Start renderings (they will take forever, I'm sure)<br>
+<br>
+Final Presentation Complete<br>
+
+
+</div><br>
+<br>
+</body></html>
