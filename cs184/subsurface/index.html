@@ -3,6 +3,7 @@
 
 
 
+
 <style>  
     div.padded {  
       padding-top: 0px;  
@@ -79,20 +80,22 @@ are present. This formula<br />
 <br />
 is the result of deriving the fluence at a point <span style="font-weight: bold;">p_o </span>on the surface that has its two lights above and below the point <span style="font-weight: bold;">p_i</span>, where <span style="font-weight: bold;">d^+ </span>and <span style="font-weight: bold;">d^- </span>are the distances from <span style="font-weight: bold;">p_o </span>to the light source inside the medium, and outside the medium, respectively. <span style="font-weight: bold;">Sigma_tr </span>is the transport coefficient computed from the reduced scattering coefficient <span style="font-weight: bold;">sigma_t' </span>and the absorption coefficent <span style="font-weight: bold;">sigma_a </span>like so:&nbsp; <br />
 <pre>Sigma_tr = sqrt(3*sigma_t' * sigma_a)<br /><br /></pre>
-A graph of <span style="font-weight: bold;">R_d </span>is shown below. <br />
+A graph of <span style="font-weight: bold;">R_d </span>is shown below (from Physically Based Rendering, 2nd Edition). <br />
 
-<span style="font-weight: bold;" /><br />
+<span style="font-weight: bold;"><br />
 <div style="text-align: center;"><img style="width: 600px; height: 433px;" src="images/rd_graph.png" alt="" /><br />
 </div>
 
-<br />
+<br /></span>
 We can clearly see that the relative contribution to the radiance at
 the output point has an exponential falloff the farther we get from the
 entrance point of the light. This allows us to use less resolution in
 our computation when the points whose irradiance we are adding are
 farther away. <br />
+
 <h4>Sample Point Generation<br />
 </h4>
+
 To generate our sample points, we shoot rays in random directions from
 a camera into the scene. Rays can either hit a translucent object
 (non-translucent objects are ignored) or hit a bounding sphere where
@@ -106,31 +109,41 @@ from any other point. If the point satisfies the criteria, it is
 inserted into the octree as a valid sample point. After we cannot
 insert any more points into the octree a sufficient number of times, we
 terminate the sample generation. <br />
+
 <h4>Preprocessing<br />
 </h4>
+
 To get ready to render, we need the incoming irradiance at all the
 points we generated with our sampler. We evaluate the direct lighting
 and indirect lighting (sans any contribution from subsurface objects)
-at all the sample points as in Project 3 and put the spectrum into an <span style="font-weight: bold;">IrradiancePoint</span> structure that also stores the area that the sample point represents and the normal of the surface it is on. All of the <span style="font-weight: bold;">IrradiancePoint</span>s are inserted into a special octree made up of <span style="font-weight: bold;">SubsurfaceOctreeNodes</span>
-which stores not only the IrradiancePoints themselves, but in non leaf
+at all the sample points as in Project 3 and put the spectrum into an <span style="font-weight: bold;">IrradiancePoint</span> structure that also stores the area that the sample point represents and the normal of the surface it is on. All of the <span style="font-weight: bold;">IrradiancePoint</span>s are inserted into a special octree made up of <span style="font-weight: bold;">SubsurfaceOctreeNode</span>s
+which stores not only the <span style="font-weight: bold;">IrradiancePoints</span> themselves, but in non leaf
 nodes also stores an illuminance-weighted position and average spectrum
 of all of the IrradiancePoints at the lower levels/finer detail levels
-of the octree. <span style="font-weight: bold;"><br />
-</span>
+of the octree. <br />
+
+
 <h4>Computation<br />
 </h4>
-<span style="font-weight: bold;" />After the preprocessing is done, we ray trace as normal. When a ray hits a translucent object, we use the <span style="font-weight: bold;">SubsurfaceOctreeNode</span>'s <span style="font-weight: bold;">mo</span> method to evaluate the outgoing radiance at the intersection point. <span style="font-weight: bold;">mo </span>traverses
+
+After the preprocessing is done, we ray trace as normal. When a ray hits a translucent object, we use the <span style="font-weight: bold;">SubsurfaceOctreeNode</span>'s <span style="font-weight: bold;">mo</span> method to evaluate the outgoing radiance at the intersection point. mo traverses
 the octree and, for IrradiancePoints close to the intersection,
-mutliplies their value by the appropriately evaluated value of <span style="font-weight: bold;"><span style="font-weight: bold;">R</span>_d</span>
+mutliplies their value by the appropriately evaluated value of <span style="font-weight: bold;">R_d</span>
 and a factor to take into account the area that the sample point
 represents, then adds this value to the output. When the
-IrradiancePoints are farther from the intersection, we use the internal
+<span style="font-weight: bold;">IrradiancePoint</span>s are farther
+from the intersection, we use the internal
 (non-leaf) nodes of the octree, which have fewer sample points that
 were computed as described earlier. We determine which detail level of
 the octree to use by comparing the solid angle of the point in
-question's area (in relation to our outgoing sample point) to a <span style="font-weight: bold;">max_error </span>value. If the solid angle is too large, we pick a higher level of detail (lower level of the octree). <br />
+question's area (in relation to our intersection point) to a max_error
+value. If the solid angle is too large, we pick a higher level of
+detail (lower level of the octree). <br />
+
 <br />
+
 <h3>Differences in our implementation</h3>
+
 We relied mostly upon Section 16.5 of Physically Based Rendering for
 direction on how to implement subsurface scattering. We were originally
 going to have a single scattering term but due to time constraints only
@@ -140,18 +153,24 @@ book, so to follow how they implemented subsurface scattering we just
 evaluated it separately and then added surface lighting from an
 optional diffuse BSDF, and disabled fresnel reflection for the inside
 of our objects when evaluating the subsurface scattering radiance. <br />
+
 <br />
+
 If we followed their implementation more closely, objects that we would
 render with subsurface would behave like they have a glossy surface
 that can exhibit total internal reflection results. This would have
 clashed with the diffuse look we were going for. <br />
+
 <br />
+
 With some additional work, the parameters of the subsurface could have
 been changed to allow addition of subsurface scattering on an object
 with an arbitrary BSDF such that when integrated together, it looks
 realistic.<br />
 <br />
+
 <h3>Challenges in Implementation</h3>
+
 Understanding the math such that we knew what we were implementing
 instead of just dumping code onto a page was a difficult step. The
 feedback Ben gave on Piazza was helpful, especially the links to
@@ -161,27 +180,40 @@ about what compiler errors meant, and having to figure out that
 "include guards" need to be on new header files was somewhat
 frustrating (think: wee hours of the morning debugging errors from the
 linker telling you that there are duplicate symbols). Also it has been
-a while (believe it or not) that one of has done actual Software
+a while (believe it or not) that one of us has done actual Software
 Engineering, so waking up those rusty areas of the brain where 61A/B
 knowledge tells you how to abstract and layout things correctly took
 some thinking. This was necessary to avoid circular includes and
 harmful design patterns.<br />
+
 <br />
+
 The subsurface part of our project would not have been possible in any
 reasonable amount of time without the reference of Physically Based
-Rendering, we used their design patterns extensively in our subsurface
+Rendering, we used their reference extensively in our subsurface
 code, and would like to credit Matt Pharr and Greg Humphreys since most
 of our implementation is based on theirs. <br />
+
 <h3 class="section-title">Results</h3>
 
 
 
+
     
-<p><br />
+<br />
+<p style="text-align: center;"><img style="width: 640px; height: 480px;" alt="" src="images/dragon_lit_back_top.png" /></p>
+<p style="text-align: center;">Dragon model lit from the top and back showing the light bleed through the material</p>
+<br />
+<p style="text-align: center;"><img src="images/dragon_blue_bsdf.png" alt="" /></p>
+<p style="text-align: center;">Dragon with dark blue diffuse reflection BSDF added to the red subsurface contribution<br />
+
 </p>
+
 <h2 class="section-title">Static VR Scenes</h2>
 
-    <p>In
+
+    
+<p>In
 addition to subsurface scattering, we wanted the explore the potential
 of bringing our global illumination methods to virtual reality. As VR
 needs to be rendered with a high framerate, raytracing is generally not
@@ -190,8 +222,12 @@ Cornell boxes in projects 3 and 4 we wanted to be able to step inside
 them in virtual reality. The built-in Oculus 360 Photos app on Samsung
 Gear VR allows us to view VR scenes, we just needed to modify our
 pathtracer to be able to render them.</p>
-    <h3 class="section-title">Technical Approach</h3>
-    <p>The
+
+    
+<h3 class="section-title">Technical Approach</h3>
+
+    
+<p>The
 360 photos allows you to input two formats of VR photos: equianglular
 projections and cubemaps. Examples of both are shown below. We weighed
 the pros and cons of each before figuring out our implementation. The
@@ -203,7 +239,9 @@ images to simulate depth. Because consumer VR is relatively new there
 was not enough documentation online for us to pursue this method. The
 cubemap projection was much simpler to integrate into our existing
 raytracer and to create the illusion of depth. </p>
-        <div align="center">
+
+        
+<div align="center">
             <table style="">
                 <tbody><tr>
                     <td align="middle">
@@ -217,7 +255,9 @@ raytracer and to create the illusion of depth. </p>
                 </td></tr>
             </tbody></table>
         </div>
-        <p>To
+
+        
+<p>To
 implement the cubemap we turned the one camera into an array of 12
 cameras: two "eye cameras" for each of the six cardinal directions.
 When the pathtracer is running in VR mode and the user presses the
@@ -225,7 +265,9 @@ render key, the pathtracer begins rendering one image for each of those
 cameras, which are stored in 12 frame buffers. When the time comes to
 write this to a file, the images are placed side by side into a png
 file corresponding to the order required by Oculus.</p>
-        <p>Just
+
+        
+<p>Just
 implementing that was enough to get us very close to a useful result,
 but there were a few issues to be ironed out. First, we needed to
 expand the cameras' field of view to 90 degrees and aspect ratio to 1
@@ -238,14 +280,22 @@ the given .dae files (a few centimeters) made this difficult. We also
 experimented with the distance at which the two cameras forward
 directions intersected with each other, but any tuning did not have a
 positive effect.</p>
-        <p>For further extension we could continue
+
+        
+<p>For further extension we could continue
 to fine tune the viewing parameters to make the scene more comfortable.
 Also, there is visible stitching between the different faces of the
 cubemap, so we could figure out further how to position the cameras to
 avoid this effect.</p>
-    <h3 class="section-title">Results</h3>
-        <p>Here is the cubemap of our Cornell box with two spheres, and a video of the spheres from within the GearVR.</p>
-        <div align="center">
+
+    
+<h3 class="section-title">Results</h3>
+
+        
+<p>Here is the cubemap of our Cornell box with two spheres, and a video of the spheres from within the GearVR.</p>
+
+        
+<div align="center">
             <table style="">
                 <tbody><tr>
                     <td align="middle">
@@ -263,26 +313,38 @@ avoid this effect.</p>
             </tbody></table>
         </div>
 
+
 <!--  Example image below    --><br />
+
 <br />
+
 <h3>References</h3>
+
 <ul>
+
   <li><a href="http://graphics.ucsd.edu/%7Ehenrik/papers/fast_bssrdf/">A Rapid Hierarchical Rendering Technique for Translucent Materials by Henrik Wann Jensen and Juan Buhler</a></li>
   <li><a href="http://www.pbrt.org/">Physically Based Rendering (2nd Edition), Part 5 by Matt Pharr and Greg Humphreys</a></li>
   <li><a href="https://graphics.stanford.edu/papers/bssrdf/bssrdf.pdf">A Practical Model for Subsurface Light Transport by Henrik Wann Jensen, Stephen R. Marschner, Marc Levoy, Pat Hanrahan</a><br />
   </li>
 </ul>
+
 <h3>Division of Work</h3>
+
 <h4>Quinn Romanek</h4>
+
 <ul>
+
   <li>VR Camera</li>
   <li>Poisson Surface Sampling Distribution</li>
   <li>Debugging Subsurface</li>
   <li>Modifications to Scene Objects, Collada parsing<br />
   </li>
 </ul>
+
 <h4>James Carlson</h4>
+
 <ul>
+
   <li>Subsurface Scattering</li>
   <ul>
     <li>Octree</li>
@@ -292,7 +354,8 @@ avoid this effect.</p>
   <li>Modifications to Scene Objects, Collada Parsing<br />
   </li>
 </ul>
-<br />
 
-        </div>
+<span style="font-weight: bold;"><span style="font-weight: bold;"><br />
+
+        </span></span></div>
 </body></html>
